@@ -34,35 +34,12 @@ class Event(BaseModel):
         return v
 
 
-class WorkspaceSummary(BaseModel):
-    """One summary row per workspace session (§2.2)."""
-
-    workspace_id: str
-    user_count: int
-    action_count: int
-    pro_subscription_count: int
-
-    @field_validator("user_count", "action_count")
-    @classmethod
-    def _validate_positive(cls, v: int) -> int:
-        if v <= 0:
-            raise ValueError(f"Value must be > 0, got {v}")
-        return v
-
-    @field_validator("pro_subscription_count")
-    @classmethod
-    def _validate_non_negative(cls, v: int) -> int:
-        if v < 0:
-            raise ValueError(f"Value must be >= 0, got {v}")
-        return v
-
-
 SESSION_GAP_DAYS: int = 30
 
 
 class Aggregator:
     """Ingests a stream of Event objects, tracks sessions per workspace (§3),
-    and emits WorkspaceSummary objects when a session terminates.
+    and emits summary dicts when a session terminates.
     """
 
     def __init__(self) -> None:
@@ -79,10 +56,12 @@ class Aggregator:
 
     # -- Public API ---------------------------------------------------------
 
-    def process(self, events: list[Event]) -> Generator[WorkspaceSummary, None, None]:
+    def process(self, events: list[Event]) -> Generator[dict, None, None]:
         """Process a batch of events in stream order.
 
-        Yields WorkspaceSummary objects as sessions terminate.
+        Yields summary dicts as sessions terminate.  Each dict has the keys
+        ``workspace_id``, ``user_count``, ``action_count``, and
+        ``pro_subscription_count``.
         """
         for event in events:
             wid = event.workspace_id
@@ -121,8 +100,8 @@ class Aggregator:
 
     def _terminate_session(
         self, workspace_id: str, state: dict, gap: timedelta
-    ) -> WorkspaceSummary:
-        """Freeze the workspace, remove from active tracking, and return its summary."""
+    ) -> dict:
+        """Freeze the workspace, remove from active tracking, and return its summary dict."""
         summary = self._build_summary(workspace_id, state)
         self._terminated.add(workspace_id)
         del self._active[workspace_id]
@@ -144,11 +123,11 @@ class Aggregator:
         state["latest_ts"] = max(event_ts, state["latest_ts"])
 
     @staticmethod
-    def _build_summary(workspace_id: str, state: dict) -> WorkspaceSummary:
-        """Build a WorkspaceSummary from a terminated session's state."""
-        return WorkspaceSummary(
-            workspace_id=workspace_id,
-            user_count=len(state["user_ids"]),
-            action_count=state["action_count"],
-            pro_subscription_count=state["pro_subscription_count"],
-        )
+    def _build_summary(workspace_id: str, state: dict) -> dict:
+        """Build a summary dict from a terminated session's state."""
+        return {
+            "workspace_id": workspace_id,
+            "user_count": len(state["user_ids"]),
+            "action_count": state["action_count"],
+            "pro_subscription_count": state["pro_subscription_count"],
+        }
