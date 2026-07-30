@@ -14,4 +14,4 @@ Apply these rules to **every Python file** in this project.
 3. **Inline comments on complex logic.** Brief "why" comments on non-obvious branches.
 4. **Every function does exactly one thing.** If a function needs a comment explaining two halves, split it.
 5. **Tight `try`/`except` blocks.** Wrap only the specific line(s) that can raise, never blanket-wrap a whole function body.
-6. **Build incrementally.** Write code in small, reviewable chunks so the user can follow along and provide feedback at each step.
+6. **Write code in small, reviewable chunks so the user can follow along and provide feedback at each step.
