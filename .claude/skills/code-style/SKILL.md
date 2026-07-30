@@ -1,6 +1,6 @@
 ---
 name: code-style
-description: Apply the project's code style rules to any code you write or review.
+description: Apply the project's code style rules to any Python code you write or review.
 ---
 
 # Code Style Rules
