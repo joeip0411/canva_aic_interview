@@ -1,6 +1,7 @@
 from collections import defaultdict
 from collections.abc import Iterable
-from datetime import datetime as dt, timedelta
+from datetime import datetime as dt
+from datetime import timedelta
 
 from src.pipeline.event import Event
 
