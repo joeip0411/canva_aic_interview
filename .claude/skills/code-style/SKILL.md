@@ -16,4 +16,3 @@ Apply these rules to **every Python file** in this project.
 5. **Tight `try`/`except` blocks.** Wrap only the specific line(s) that can raise, never blanket-wrap a whole function body.
 6. **Write code in small, reviewable chunks so the user can follow along and provide feedback at each step.**
 7. **Clarify when unsure.** If the spec, intent, or design choice is ambiguous, ask the user before proceeding — never guess.
-8. **Log meaningful transitions and metrics.** Use the standard `logging` module. Emit INFO-level logs whenever the system crosses a boundary (e.g., batch ingested, day closed, results flushed) and include the key metric (e.g., event count, active-user count, date). Use DEBUG for per-event details. Never use `print()` for operational output.
